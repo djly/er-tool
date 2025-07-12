@@ -34,7 +34,8 @@ export const makeStore = () => {
     return makeConfiguredStore()
   } else {
     const persistedReducer = persistReducer(persistConfig, rootReducer)
-    let store: any = configureStore({
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const store: any = configureStore({
       reducer: persistedReducer,
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

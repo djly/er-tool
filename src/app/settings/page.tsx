@@ -26,15 +26,15 @@ interface Character {
 
 export default function Home() {
 
-  const [storageValue, setStorageValue] = useState("");
-  const [isLoading, setLoading] = useState(true);
-  const [value, setValue] = useLocalStorage<LocalStorageObject>("account", {});
+  // const [storageValue, setStorageValue] = useState("");
+  // const [isLoading, setLoading] = useState(true);
+  // const [value, setValue] = useLocalStorage<LocalStorageObject>("account", {});
 
-  useEffect(() => {
-    setStorageValue(value);
-    console.log(value);
-    setLoading(false)
-  }, [])
+  // useEffect(() => {
+  //   setStorageValue(value);
+  //   console.log(value);
+  //   setLoading(false)
+  // }, [])
 
   const dispatch = useAppDispatch();
 

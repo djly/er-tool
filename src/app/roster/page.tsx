@@ -16,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAppDispatch } from '@/lib/redux/hooks';
 
 interface Character {
-  rarity: any;
+  rarity: string;
   id: number,
   unitId: number,
   slug: string,
@@ -44,45 +44,6 @@ export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  var filterFields = "";
-
-  function generateFilteredCharacters() {
-    var characters = allCharacters;
-
-    //Filter characters based on selected rarity, element, and owned status
-
-    //1 Element
-    if (elementFilter.length > 0) {
-      characters = characters.filter((character:Character) => elementFilter.includes(character.element.toLowerCase()));
-    }
-
-    //2 rarity
-    if (rarityFilter.length > 0) {
-      characters = characters.filter((character:Character) => rarityFilter.includes(character.rarity.toLowerCase()));
-    }
-
-    //3 owned status
-    if (ownedFilter && ownedFilter.length > 0) {
-      if (ownedFilter === 'owned') {
-        characters = characters.filter((character:Character) => player.characters.includes(character.unitId));
-      } else if (ownedFilter === 'unowned') {
-        characters = characters.filter((character:Character) => !player.characters.includes(character.unitId));
-
-      }
-    }
-    //4 search term'
-    if (searchTerm) {
-      characters = characters.filter((character:Character) => {
-        return character.name.toLowerCase().includes(searchTerm.toLowerCase()) 
-        // ||
-        //   character.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        //   character.element.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        //   character.faction.toLowerCase().includes(searchTerm.toLowerCase());
-      });
-    }      
-
-    setFilteredCharacters(characters)
-  };
 
   useEffect(() => {
     fetch('http://192.168.2.140:4000/characters')
@@ -115,10 +76,7 @@ export default function Home() {
 
   //   fetchData();
   // }, [debouncedSearchTerm]);
-  useEffect(() => {
-    generateFilteredCharacters();
-  }, [allCharacters, elementFilter, rarityFilter, ownedFilter, debouncedSearchTerm]);
-  const gradiantClass: {
+    const gradiantClass: {
     [key: string]: string;
   } = {
     SSR: 'bg-linear-to-t to-[#00000] from-amber-400',
@@ -127,8 +85,51 @@ export default function Home() {
     '*': 'bg-linear-to-t to-[#00000] to-gray-400', // Default case
   }
 
-  const player = useAppSelector((state) => state.player);
   const dispatch = useAppDispatch();
+  const player = useAppSelector((state) => state.player);
+  
+  useEffect(() => {
+      function generateFilteredCharacters() {
+          let characters = allCharacters;
+
+          //Filter characters based on selected rarity, element, and owned status
+
+          //1 Element
+          if (elementFilter.length > 0) {
+            characters = characters.filter((character:Character) => elementFilter.includes(character.element.toLowerCase()));
+          }
+
+          //2 rarity
+          if (rarityFilter.length > 0) {
+            characters = characters.filter((character:Character) => rarityFilter.includes(character.rarity.toLowerCase()));
+          }
+
+          //3 owned status
+          if (ownedFilter && ownedFilter.length > 0) {
+            if (ownedFilter === 'owned') {
+              characters = characters.filter((character:Character) => player.characters.includes(character.unitId));
+            } else if (ownedFilter === 'unowned') {
+              characters = characters.filter((character:Character) => !player.characters.includes(character.unitId));
+
+            }
+          }
+          //4 search term'
+          if (debouncedSearchTerm) {
+            characters = characters.filter((character:Character) => {
+              return character.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) 
+              // ||
+              //   character.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              //   character.element.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              //   character.faction.toLowerCase().includes(searchTerm.toLowerCase());
+            });
+          }      
+
+          setFilteredCharacters(characters)
+        };
+
+    generateFilteredCharacters();
+  }, [allCharacters, elementFilter, rarityFilter, ownedFilter, debouncedSearchTerm, player.characters]);
+
 
   return (
     <div className="grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pt-4 pb-20 font-[family-name:var(--font-geist-sans)]">
