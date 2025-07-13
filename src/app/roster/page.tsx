@@ -46,7 +46,8 @@ export default function Home() {
 
 
   useEffect(() => {
-    fetch('https://www.prydwen.gg/page-data/etheria-restart/characters/page-data.json')
+
+    fetch('./data/db.json')
       .then((res) => res.json())
       .then((data) => {
         const characters = data.result.data.allCharacters.nodes
