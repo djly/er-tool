@@ -46,11 +46,12 @@ export default function Home() {
 
 
   useEffect(() => {
-    fetch('http://192.168.2.140:4000/characters')
+    fetch('https://www.prydwen.gg/page-data/etheria-restart/characters/page-data.json')
       .then((res) => res.json())
       .then((data) => {
-        setAllCharacters(data)
-        setFilteredCharacters(data)
+        const characters = data.result.data.allCharacters.nodes
+        setAllCharacters(characters)
+        setFilteredCharacters(characters)
         setLoading(false)
       })
   }, [])
@@ -158,32 +159,32 @@ export default function Home() {
               onValueChange={(value) => setElementFilter(value as string[])}
             >
               <ToggleGroupItem value="constant">
-                <div className='w-20'><img src={`/elements/ele_constant.webp`}
+                <div className='w-20'><img src={`./elements/ele_constant.webp`}
                   alt="Constant"
                   width={20}
                   height={20}
                 /></div>
               </ToggleGroupItem>
               <ToggleGroupItem value="disorder">
-                <img src={`/elements/ele_disorder.webp`}
+                <img src={`./elements/ele_disorder.webp`}
                   width={20}
                   height={20}
                   alt="Constant"
                 /> </ToggleGroupItem>
               <ToggleGroupItem value="hollow">
-                <img src={`/elements/ele_hollow.webp`}
+                <img src={`./elements/ele_hollow.webp`}
                   width={20}
                   height={20}
                   alt="Constant"
                 /> </ToggleGroupItem>
               <ToggleGroupItem value="odd">
-                <img src={`/elements/ele_odd.webp`}
+                <img src={`./elements/ele_odd.webp`}
                   width={20}
                   height={20}
                   alt="Constant"
                 /> </ToggleGroupItem>
               <ToggleGroupItem value="reason">
-                <img src={`/elements/ele_reason.webp`}
+                <img src={`./elements/ele_reason.webp`}
                   width={20}
                   height={20}
                   alt="Constant"
@@ -282,7 +283,7 @@ export default function Home() {
                   <div className={"relative items-center " + gradiantClass[character.rarity]} style={{ height: '136px', width: '100px' }}>
                 <div className="absolute top-0 right-0">
                 <Image
-                  src={`/elements/ele_${character.element.toLowerCase()}.webp`}
+                  src={`./elements/ele_${character.element.toLowerCase()}.webp`}
                   width="30"
                   height="30"
                   alt={character.element}
@@ -290,7 +291,7 @@ export default function Home() {
                   </div>
                   <div className="top-0 left-0 w-full text-center">
                 <Image
-                  src={`/characters/${character.slug}_card.webp`}
+                  src={`./characters/${character.slug}_card.webp`}
                   width="100"
                   height="136"
                   alt={character.name}
