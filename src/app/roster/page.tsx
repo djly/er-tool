@@ -37,6 +37,7 @@ export default function Home() {
   const [ownedFilter, setOwnedFilter] = useState<string>("");
 
 
+  const [editMode, setEditMode] = useState(false);
   const [isLoading, setLoading] = useState(true)
 
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300); // Debounce for 300ms
@@ -50,7 +51,7 @@ export default function Home() {
     fetch('./data/db.json')
       .then((res) => res.json())
       .then((data) => {
-        const characters = data.result.data.allCharacters.nodes
+        const characters = data.characters
         setAllCharacters(characters)
         setFilteredCharacters(characters)
         setLoading(false)
@@ -227,6 +228,13 @@ export default function Home() {
             </ToggleGroup>
           </div>
         </div>
+        <div className='flex flex-col align-start ml-auto text-right'>
+          <label className='text-right'>Edit Mode</label>
+          <Switch
+            checked={editMode}
+            onCheckedChange={(checked) => setEditMode(checked)}
+          />
+        </div>
         {/* <div className='flex flex-col align-start ml-auto text-right'>
         Select:
           <div className=''>
@@ -270,17 +278,20 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-6 grid-cols-1sm gap-4 justify-between w-full">
           {filteredCharacters.map((character: Character) => {
-            return <Card key={character.unitId} className="flex flex-col justify-between" >
+
+            const owned = player.characters.includes(character.unitId);
+
+            return <Card key={character.unitId} className={"flex flex-col" + (owned ? "" : " opacity-30")} >
               <CardHeader className='text-center'>
                 <CardTitle className='text-center'><a className='flex' target="_blank" href={"https://www.prydwen.gg/etheria-restart/characters/" + character.slug}>{character.name}
-                  <Image src={'/favicon-32x32.png'}
+                  <Image src={'./favicon-32x32.png'}
                     width={15}
                     height={15}
                     alt={'prydwen'} />
                 </a></CardTitle>
                 </CardHeader>
                <CardContent className='flex flex-col items-center gap-2 text-center'>
-                  <CardDescription></CardDescription>
+                  <CardDescription></CardDescription>np
                   <div className={"relative items-center " + gradiantClass[character.rarity]} style={{ height: '136px', width: '100px' }}>
                 <div className="absolute top-0 right-0">
                 <Image
@@ -305,7 +316,7 @@ export default function Home() {
                   <Badge variant='secondary' className="text-xs">{character.element.toUpperCase()}</Badge>
                   <Badge variant='secondary' className="text-xs">{character.faction.toUpperCase()}</Badge>
                 </div> */}
-                 <Switch
+                 { editMode ? (<Switch
                   checked={player.characters.some( (unitId:number ) => unitId == character.unitId)}
                   onCheckedChange={(checked) => {
                     if (checked) {
@@ -321,7 +332,58 @@ export default function Home() {
                         payload: character.unitId,
                     });
                   }}}
-                  ></Switch>
+                  ></Switch>)
+                :""}
+                  {/* When in edit mode, if the player owns the unit, show 3 input forms to collect the skill levels of skills 1,2 and 3.
+                  Display the inputs in a row, side by side.
+                  When not in edit mode just show the 3 skill levels as text */}
+
+                  {player.characters.includes(character.unitId) && (
+                    <div className="">
+                      <label>Skills</label>
+                      {editMode ? (
+                        <div className="flex flex-row gap-2">
+                          {[1, 2, 3].map((skillNum) => (
+                            <Input
+                              key={skillNum}
+                              name={`skill${skillNum}`}
+                              type="number"
+                              placeholder={`Skill ${skillNum}`}
+                              min={0}
+                              max={5}
+                              className="w-16"
+                              value={
+                                player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
+                              }
+                              onChange={(e) => {
+                                const value = Number(e.target.value);
+                                dispatch({
+                                  type: 'player/setCharacterSkillLevel',
+                                  payload: {
+                                    characterId: character.unitId,
+                                    skillIndex: skillNum - 1,
+                                    level: value,
+                                  },
+                                });
+                              }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-row gap-2">
+                          {[1, 2, 3].map((skillNum) => (
+                            <span
+                              key={skillNum}
+                              className="px-2 py-1 rounded text-xs"
+                              title={`Skill ${skillNum}`}
+                            >
+                              {player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? 1}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
               </CardContent> 
               {/* <CardFooter> <a target="_blank" href={"https://www.prydwen.gg/etheria-restart/characters/" + character.slug} >
                 <Badge variant='secondary' asChild>

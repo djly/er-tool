@@ -8,6 +8,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "build": "next build",
+    "postbuild": "cp public/data/db.json build/data/db.json",
     "start": "next start",
     "lint": "next lint"
   },

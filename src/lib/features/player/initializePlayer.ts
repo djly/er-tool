@@ -8,6 +8,7 @@ export function initializePlayer(name: string): Player {
     name: name,
     displayInfo: function (): string {
         throw new Error('Function not implemented.');
-    }
+    },
+    charactersInvestment: {},
 };
 }

@@ -1,11 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+
+interface CharacterInvestment {
+    skillLevels: number[];
+    starLevel: number;
+    setBonuses: string[]; // Adjust type as needed
+}
+
 interface PlayerState {
     id: string | null;
     name: string | null;
     email: string | null;
-    characters: number[]; // Assuming characters are represented by their IDs
+    characters: number[];
     isLoggedIn: boolean;
+    charactersInvestment: {
+        [characterId: number]: CharacterInvestment;
+    };
 }
 
 const initialState: PlayerState = {
@@ -14,6 +24,7 @@ const initialState: PlayerState = {
     email: null,
     characters: [],
     isLoggedIn: false,
+    charactersInvestment: {},
 };
 
 const playerSlice = createSlice({
@@ -47,16 +58,27 @@ const playerSlice = createSlice({
             }
         },
         removeCharacter (state, action: PayloadAction<number>) {
-            state.characters = state.characters.filter(characterId => characterId !== action.payload);
+            state.characters = state.characters.filter((characterId: number) => characterId !== action.payload);
         },
         updateCharacters(state, action: PayloadAction<{ characters: number[] }>) {
             state.characters = action.payload.characters;
         },
         clearCharacters(state) {
             state.characters = [];
+        },
+        setCharacterSkillLevel(state, action: PayloadAction<{ characterId: number; skillIndex: number; level: number }>) {
+            const { characterId, skillIndex, level } = action.payload;
+            console.log(`Setting skill level for character ${characterId}, skill index ${skillIndex}, level ${level}`);
+            if (!state.charactersInvestment) {
+                state.charactersInvestment = {};
+            }
+            if (!state.charactersInvestment[characterId]) {
+                state.charactersInvestment[characterId] = { skillLevels: [1, 1, 1], starLevel: 1, setBonuses: [] };
+            }
+            state.charactersInvestment[characterId].skillLevels[skillIndex] = level;
         }
     },
 });
 
-export const { login, logout, updatePlayer, addCharacter,removeCharacter, updateCharacters } = playerSlice.actions;
+export const { login, logout, updatePlayer, addCharacter,removeCharacter, updateCharacters, setCharacterSkillLevel } = playerSlice.actions;
 export default playerSlice.reducer;
