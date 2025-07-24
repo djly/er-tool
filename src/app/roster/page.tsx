@@ -291,7 +291,7 @@ export default function Home() {
                 </a></CardTitle>
                 </CardHeader>
                <CardContent className='flex flex-col items-center gap-2 text-center'>
-                  <CardDescription></CardDescription>np
+                  <CardDescription></CardDescription>
                   <div className={"relative items-center " + gradiantClass[character.rarity]} style={{ height: '136px', width: '100px' }}>
                 <div className="absolute top-0 right-0">
                 <Image
@@ -371,15 +371,28 @@ export default function Home() {
                         </div>
                       ) : (
                         <div className="flex flex-row gap-2">
-                          {[1, 2, 3].map((skillNum) => (
+                          {/* The color of the span depends on the level (default, green, blue, yellow, red) */}
+                          {[1, 2, 3].map((skillNum) => { 
+                            
+                            
+                            const skillLevel = player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? 1;
+                            const bgColor = skillLevel >= 5 ? " bg-red-500 text-white" : 
+                            skillLevel >= 4 ? " bg-yellow-500 text-white" : 
+                            skillLevel >= 3 ? " bg-blue-500 text-white" : 
+                            skillLevel >= 2 ? " bg-green-500 text-white" : 
+                            " text-white";
+                            const skillLevelText = skillLevel >= 5 ? "MAX" : skillLevel;
+
+                            return(
+                           
                             <span
                               key={skillNum}
-                              className="px-2 py-1 rounded text-xs"
-                              title={`Skill ${skillNum}`}
+                              className={"px-2 py-1 rounded text-xs" + bgColor}
+                              title={`Skill ${skillNum} Level: ${skillLevelText}`}
                             >
-                              {player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? 1}
+                              {skillLevelText ?? 1}
                             </span>
-                          ))}
+                          )})}
                         </div>
                       )}
                     </div>
