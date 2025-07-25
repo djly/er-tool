@@ -44,7 +44,7 @@ export default function Home() {
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold">Settings</h1>
           <p className="text-sm text-muted-foreground">Manage your account settings and preferences.</p>
-          <Button onChange={() =>
+          <Button onClick={() => 
             dispatch({
               type: 'player/clearCharacters',
             })
