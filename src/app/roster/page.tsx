@@ -325,7 +325,7 @@ export default function Home() {
                   onCheckedChange={(checked) => {
                     if (checked) {
                       // Add character to player's roster
-                      let charI = newCharacterInvestment();
+                      const charI = newCharacterInvestment();
                       charI.starLevel = character.rarity.toUpperCase() === 'SSR' ? 4 : character.rarity.toUpperCase() === 'SR' ? 3 : 2;
                       dispatch({
                         type: 'player/addCharacter',
