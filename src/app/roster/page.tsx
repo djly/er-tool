@@ -15,6 +15,10 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { useAppDispatch } from '@/lib/redux/hooks';
 
+import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
+import { newCharacterInvestment } from '@/lib/redux/slices/playerSlice';
+
+
 interface Character {
   rarity: string;
   id: number,
@@ -45,18 +49,38 @@ export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const dispatch = useAppDispatch();
+  const player = useAppSelector((state) => state.player);
+  const data = useAppSelector((state) => state.data);
+  
+
+    // if (!data || !data.characters) {
+    //   console.error("Data or characters not found");
+    // }
+    // console.log("Data loaded", data);
+    // if (data.characters.length > 0) {
+
+    //   setAllCharacters(data.characters);
+    //   setFilteredCharacters(data.characters);
+    //   setLoading(false);
+
+    // } 
 
   useEffect(() => {
+    
 
-    fetch('./data/db.json')
-      .then((res) => res.json())
-      .then((data) => {
-        const characters = data.characters
-        setAllCharacters(characters)
-        setFilteredCharacters(characters)
-        setLoading(false)
-      })
-  }, [])
+      fetch('./data/db.json')
+        .then((res) => res.json())
+        .then((data) => {
+          const characters = data.characters
+          setAllCharacters(characters)
+          setFilteredCharacters(characters)
+          setLoading(false)
+        })
+
+    }, [])
+
+  
 
   useEffect(() => {
     if (debouncedSearchTerm) {
@@ -88,8 +112,9 @@ export default function Home() {
     '*': 'bg-linear-to-t to-[#00000] to-gray-400', // Default case
   }
 
-  const dispatch = useAppDispatch();
-  const player = useAppSelector((state) => state.player);
+  // const dispatch = useAppDispatch();
+  // const player = useAppSelector((state) => state.player);
+  // const data = useAppSelector((state) => state.data);
   
   useEffect(() => {
       function generateFilteredCharacters() {
@@ -110,10 +135,9 @@ export default function Home() {
           //3 owned status
           if (ownedFilter && ownedFilter.length > 0) {
             if (ownedFilter === 'owned') {
-              characters = characters.filter((character:Character) => player.characters.includes(character.unitId));
+              characters = characters.filter((character:Character) => player.characters[character.unitId]);
             } else if (ownedFilter === 'unowned') {
-              characters = characters.filter((character:Character) => !player.characters.includes(character.unitId));
-
+              characters = characters.filter((character:Character) => !player.characters[character.unitId]);
             }
           }
           //4 search term'
@@ -278,10 +302,16 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-6 grid-cols-1sm gap-4 justify-between w-full">
           {filteredCharacters.map((character: Character) => {
+            // Check if the player owns the character
+            const owned = player.characters.hasOwnProperty(character.unitId);
 
-            const owned = player.characters.includes(character.unitId);
+            // Determine if the character should be transparent based on owned status and filter
+            //1. If we are looking at unowned characters (filter set to unowned) is should be opaque
+            //2. If we are looking at owned characters it should be opaque
+            //3. If we have not specified a filter, it should based on the owned status
+            const shouldBeTransparent = (ownedFilter === 'unowned' ) || (ownedFilter !== 'unowned' && !owned);
 
-            return <Card key={character.unitId} className={"flex flex-col" + (owned ? "" : " opacity-30")} >
+            return <Card key={character.unitId} className={"flex flex-col" + (shouldBeTransparent ? " opacity-30": "")} >
               <CardHeader className='text-center'>
                 <CardTitle className='text-center'><a className='flex' target="_blank" href={"https://www.prydwen.gg/etheria-restart/characters/" + character.slug}>{character.name}
                   <Image src={'./favicon-32x32.png'}
@@ -289,10 +319,42 @@ export default function Home() {
                     height={15}
                     alt={'prydwen'} />
                 </a></CardTitle>
+                { editMode ? (<Switch
+                 className='scale-150 '
+                  checked={owned}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      // Add character to player's roster
+                      let charI = newCharacterInvestment();
+                      charI.starLevel = character.rarity.toUpperCase() === 'SSR' ? 4 : character.rarity.toUpperCase() === 'SR' ? 3 : 2;
+                      dispatch({
+                        type: 'player/addCharacter',
+                        payload: {characterId: character.unitId,
+                          ci: charI
+                        }
+                      });
+                    } else {
+                      // Remove character from player's roster
+                      dispatch({
+                        type: 'player/removeCharacter',
+                        payload: character.unitId,
+                    });
+                  }}}
+                  ></Switch>)
+                :""}
                 </CardHeader>
                <CardContent className='flex flex-col items-center gap-2 text-center'>
                   <CardDescription></CardDescription>
                   <div className={"relative items-center " + gradiantClass[character.rarity]} style={{ height: '136px', width: '100px' }}>
+               
+                  {!editMode ? ( <div className="absolute bottom-0 left-0">
+                    <Rating defaultValue={character.rarity.toUpperCase() === 'SSR' ? 4 : character.rarity.toUpperCase() === 'SR' ? 3 : 2} value={player.characters[character.unitId]?.starLevel} readOnly>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <RatingButton key={index} size={11}/>
+                  ))}
+                </Rating>
+                </div>) : ""}
+                 
                 <div className="absolute top-0 right-0">
                 <Image
                   src={`./elements/ele_${character.element.toLowerCase()}.webp`}
@@ -316,29 +378,23 @@ export default function Home() {
                   <Badge variant='secondary' className="text-xs">{character.element.toUpperCase()}</Badge>
                   <Badge variant='secondary' className="text-xs">{character.faction.toUpperCase()}</Badge>
                 </div> */}
-                 { editMode ? (<Switch
-                  checked={player.characters.some( (unitId:number ) => unitId == character.unitId)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      // Add character to player's roster
-                      dispatch({
-                        type: 'player/addCharacter',
-                        payload: character.unitId
-                      });
-                    } else {
-                      // Remove character from player's roster
-                      dispatch({
-                        type: 'player/removeCharacter',
-                        payload: character.unitId,
-                    });
-                  }}}
-                  ></Switch>)
-                :""}
+                 
+                {editMode ? (<Rating defaultValue={character.rarity.toUpperCase() === 'SSR' ? 4 : character.rarity.toUpperCase() === 'SR' ? 3 : 2} value={player.characters[character.unitId]?.starLevel} onValueChange={(value) => {dispatch({
+                  type: 'player/setCharacterStarLevel',
+                  payload: {
+                    characterId: character.unitId,
+                    starLevel: value,
+                  },
+                })}}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <RatingButton key={index}  />
+                  ))}
+                </Rating>): ""}
                   {/* When in edit mode, if the player owns the unit, show 3 input forms to collect the skill levels of skills 1,2 and 3.
                   Display the inputs in a row, side by side.
                   When not in edit mode just show the 3 skill levels as text */}
 
-                  {player.characters.includes(character.unitId) && (
+                  {player.characters.hasOwnProperty(character.unitId) && (
                     <div className="">
                       <label>Skills</label>
                       {editMode ? (
@@ -353,7 +409,7 @@ export default function Home() {
                               max={5}
                               className="w-16"
                               value={
-                                player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
+                                player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
                               }
                               onChange={(e) => {
                                 const value = Number(e.target.value);
@@ -375,7 +431,7 @@ export default function Home() {
                           {[1, 2, 3].map((skillNum) => { 
                             
                             
-                            const skillLevel = player.charactersInvestment?.[character.unitId]?.skillLevels[skillNum - 1] ?? 1;
+                            const skillLevel = player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? 1;
                             const bgColor = skillLevel >= 5 ? " bg-red-500 text-white" : 
                             skillLevel >= 4 ? " bg-yellow-500 text-white" : 
                             skillLevel >= 3 ? " bg-blue-500 text-white" : 

@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { act } from 'react';
 
 
-interface CharacterInvestment {
+interface CharacterInvestmentI {
     skillLevels: number[];
     starLevel: number;
     setBonuses: string[]; // Adjust type as needed
@@ -11,20 +12,24 @@ interface PlayerState {
     id: string | null;
     name: string | null;
     email: string | null;
-    characters: number[];
+    characters: Record<string, CharacterInvestmentI>; // Using Record to map character IDs to their investments
     isLoggedIn: boolean;
-    charactersInvestment: {
-        [characterId: number]: CharacterInvestment;
-    };
 }
 
 const initialState: PlayerState = {
     id: null,
     name: null,
     email: null,
-    characters: [],
+    characters: {}, // Initialize as an empty object
     isLoggedIn: false,
-    charactersInvestment: {},
+};
+
+export function newCharacterInvestment(){
+    return {
+        skillLevels: [1, 1, 1], // Default skill levels
+        starLevel: 1, // Default star level
+        setBonuses: [], // Default set bonuses
+    };
 };
 
 const playerSlice = createSlice({
@@ -51,34 +56,44 @@ const playerSlice = createSlice({
                 state.email = action.payload.email;
             }
         },
-        addCharacter(state, action: PayloadAction<number>) {
-            if (!state.characters.includes(action.payload)) {
+        addCharacter(state, action: PayloadAction<{characterId : string, ci?: CharacterInvestmentI}>) {
+            console.log(`Adding character with ID ${action.payload.characterId} to player's roster.`);
+            if (!state.characters[action.payload.characterId]) {
                 // Add character ID to the player's roster if it doesn't already exist
-                state.characters.push(action.payload);
-            }
+                if (action.payload.ci) {
+                    state.characters[action.payload.characterId] = action.payload.ci;
+                } else {
+                    state.characters[action.payload.characterId] = newCharacterInvestment();
+                }    
+            };
         },
         removeCharacter (state, action: PayloadAction<number>) {
-            state.characters = state.characters.filter((characterId: number) => characterId !== action.payload);
-        },
-        updateCharacters(state, action: PayloadAction<{ characters: number[] }>) {
-            state.characters = action.payload.characters;
+            console.log(`Removing character with ID ${action.payload} from player's roster.`);
+            // This is safe with Immer!
+            delete state.characters[action.payload];
         },
         clearCharacters(state) {
-            state.characters = [];
+            console.log(`Clearing all characters from player's roster.`);
+            state.characters = {}
         },
         setCharacterSkillLevel(state, action: PayloadAction<{ characterId: number; skillIndex: number; level: number }>) {
             const { characterId, skillIndex, level } = action.payload;
             console.log(`Setting skill level for character ${characterId}, skill index ${skillIndex}, level ${level}`);
-            if (!state.charactersInvestment) {
-                state.charactersInvestment = {};
-            }
-            if (!state.charactersInvestment[characterId]) {
-                state.charactersInvestment[characterId] = { skillLevels: [1, 1, 1], starLevel: 1, setBonuses: [] };
-            }
-            state.charactersInvestment[characterId].skillLevels[skillIndex] = level;
+            if (!state.characters[characterId]) {
+                state.characters[characterId] = newCharacterInvestment();
+            } 
+            
+            state.characters[characterId].skillLevels[skillIndex] = level > 5 ? 5 : level < 1 ? 1 : level; // Ensure skill level is between 1 and 5            
+        },
+        setCharacterStarLevel(state, action: PayloadAction<{ characterId: number; starLevel: number}>) {
+            const { characterId, starLevel } = action.payload;
+            if (!state.characters[characterId]) {
+                state.characters[characterId] = newCharacterInvestment();
+            } 
+            state.characters[characterId].starLevel = starLevel;
         }
     },
 });
 
-export const { login, logout, updatePlayer, addCharacter,removeCharacter, updateCharacters, setCharacterSkillLevel } = playerSlice.actions;
+export const { login, logout, updatePlayer, addCharacter,removeCharacter, clearCharacters, setCharacterSkillLevel,setCharacterStarLevel } = playerSlice.actions;
 export default playerSlice.reducer;

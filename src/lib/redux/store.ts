@@ -2,6 +2,8 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import playerSlice from "./slices/playerSlice";
+import dataSlice from "./slices/dataSlice";
+
 import {
   FLUSH,
   REHYDRATE,
@@ -19,6 +21,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   player: playerSlice,
+  data: dataSlice,
 })
 
 const makeConfiguredStore = () =>
