@@ -76,6 +76,36 @@ export default function RootLayout({
             </NavigationMenu>
             <StoreProvider>{children}</StoreProvider>
           </ThemeProvider>
+
+          <div className="fixed top-4 right-8 flex gap-4 z-50">
+            <a
+              href="https://github.com/djly/er-tool/issues/new?labels=feature"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              Feature Request
+            </a>
+            <a
+              href="https://github.com/djly/er-tool/issues/new?labels=bug"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            >
+              Bug report
+            </a>
+          </div>
+
+          <div className="fixed top-4 left-8 flex gap-4 z-50">
+            {/* <a
+              href="https://github.com/djly/er-tool/issues/new?labels=feature"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              Buy me a coffee or some pulls
+            </a> */}
+          </div>
         </body>
       </html>
   );
