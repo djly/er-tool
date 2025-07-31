@@ -18,6 +18,8 @@ import { useAppDispatch } from '@/lib/redux/hooks';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import { newCharacterInvestment } from '@/lib/redux/slices/playerSlice';
 
+import { PlusCircle, MinusCircle } from 'lucide-react';
+
 
 interface Character {
   rarity: string;
@@ -166,141 +168,107 @@ export default function Home() {
           <CardHeader>Box Stats</CardHeader>
           <CardContent>XX / XX Owned</CardContent>
           
-        </Card> */}
-        <div className="grid grid-cols-2 gap-8 justify-between">
-        <div className='flex flex-col'>
-          Filter:
-          <div className='flex gap-[12px] flex-grow'>
-            <Input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..." />
-            <ToggleGroup
-              variant="outline"
-              type="multiple"
-              
-              defaultValue={elementFilter}
-              value={elementFilter}
-              onValueChange={(value) => setElementFilter(value as string[])}
-            >
-              <ToggleGroupItem value="constant">
-                <div className='w-20'><img src={`./elements/ele_constant.webp`}
-                  alt="Constant"
-                  width={20}
-                  height={20}
-                /></div>
-              </ToggleGroupItem>
-              <ToggleGroupItem value="disorder">
-                <img src={`./elements/ele_disorder.webp`}
-                  width={20}
-                  height={20}
-                  alt="Constant"
-                /> </ToggleGroupItem>
-              <ToggleGroupItem value="hollow">
-                <img src={`./elements/ele_hollow.webp`}
-                  width={20}
-                  height={20}
-                  alt="Constant"
-                /> </ToggleGroupItem>
-              <ToggleGroupItem value="odd">
-                <img src={`./elements/ele_odd.webp`}
-                  width={20}
-                  height={20}
-                  alt="Constant"
-                /> </ToggleGroupItem>
-              <ToggleGroupItem value="reason">
-                <img src={`./elements/ele_reason.webp`}
-                  width={20}
-                  height={20}
-                  alt="Constant"
-                /> </ToggleGroupItem>
+        </Card> */}<div className="flex flex-col gap-2 w-full">
+            <div className="font-semibold mb-1">Filter:</div>
+            <div className="flex flex-wrap gap-[12px] flex-grow w-full
+              sm:flex-row
+              flex-col
+            ">
+              <Input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                className="w-full sm:w-auto"
+              />
+              <ToggleGroup
+                variant="outline"
+                type="multiple"
+                defaultValue={elementFilter}
+                value={elementFilter}
+                onValueChange={(value) => setElementFilter(value as string[])}
+                className="w-full sm:w-auto"
+              >
+                <ToggleGroupItem value="constant">
+                  <div className='w-20'><img src={`./elements/ele_constant.webp`}
+                    alt="Constant"
+                    width={20}
+                    height={20}
+                  /></div>
+                </ToggleGroupItem>
+                <ToggleGroupItem value="disorder">
+                  <img src={`./elements/ele_disorder.webp`}
+                    width={20}
+                    height={20}
+                    alt="Disorder"
+                  />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="hollow">
+                  <img src={`./elements/ele_hollow.webp`}
+                    width={20}
+                    height={20}
+                    alt="Hollow"
+                  />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="odd">
+                  <img src={`./elements/ele_odd.webp`}
+                    width={20}
+                    height={20}
+                    alt="Odd"
+                  />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="reason">
+                  <img src={`./elements/ele_reason.webp`}
+                    width={20}
+                    height={20}
+                    alt="Reason"
+                  />
+                </ToggleGroupItem>
+              </ToggleGroup>
 
-            </ToggleGroup>
+              <ToggleGroup
+                variant="outline"
+                type="multiple"
+                defaultValue={rarityFilter}
+                value={rarityFilter}
+                onValueChange={(value) => setRarityFilter(value as string[])}
+                className="w-full sm:w-auto"
+              >
+                <ToggleGroupItem value="ssr">
+                  SSR
+                </ToggleGroupItem>
+                <ToggleGroupItem value="sr">
+                  SR
+                </ToggleGroupItem>
+                <ToggleGroupItem value="r">
+                  R
+                </ToggleGroupItem>
+              </ToggleGroup>
 
-            <ToggleGroup
-              variant="outline"
-              type="multiple"
-              defaultValue={rarityFilter}
-              value={rarityFilter}
-              onValueChange={(value) => setRarityFilter(value as string[])}
-            >
-              <ToggleGroupItem value="ssr">
-                SSR
-              </ToggleGroupItem>
-              <ToggleGroupItem value="sr">
-                SR
-              </ToggleGroupItem>
-              <ToggleGroupItem value="r">
-                R
-              </ToggleGroupItem>
-            </ToggleGroup>
-
-            <ToggleGroup
-              variant="outline"
-              type="single"
-              defaultValue={ownedFilter}
-              value={ownedFilter}
-              onValueChange={(value) => setOwnedFilter(value)}
-            >
-              <ToggleGroupItem value="owned">
-                Owned
-              </ToggleGroupItem>
-              <ToggleGroupItem value="unowned">
-                Unowned
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-        </div>
-        <div className='flex flex-col align-start ml-auto text-right'>
-          <label className='text-right'>Edit Mode</label>
-          <Switch
-            checked={editMode}
-            onCheckedChange={(checked) => setEditMode(checked)}
-          />
-        </div>
-        {/* <div className='flex flex-col align-start ml-auto text-right'>
-        Select:
-          <div className=''>
-
-            <div>
               <ToggleGroup
                 variant="outline"
                 type="single"
-                defaultValue={debouncedSearchTerm}
-                value={debouncedSearchTerm}
-                onValueChange={(value) => {
-                  if (value === 'all') {
-                    // Add all characters to player's roster
-                    const allUnitIds = filteredCharacters.map((character: Character) => character.unitId);
-                    dispatch({
-                      type: 'player/clearCharacters',
-                    });
-                  } else if (value === 'none') {
-                    // Remove all characters from player's roster
-                    dispatch({
-                      type: 'player/clearCharacters',
-                    });
-                  } else {
-                    // Handle other cases if needed
-                    setFilteredCharacters(allCharacters.filter(character => character.slug.includes(value)));
-
-                  }}
-    }
+                defaultValue={ownedFilter}
+                value={ownedFilter}
+                onValueChange={(value) => setOwnedFilter(value)}
+                className="w-full sm:w-auto"
               >
-                <ToggleGroupItem value="all">
-                  All
+                <ToggleGroupItem value="owned">
+                  Owned
                 </ToggleGroupItem>
-                <ToggleGroupItem value="none">
-                  None
+                <ToggleGroupItem value="unowned">
+                  Unowned
                 </ToggleGroupItem>
               </ToggleGroup>
+              <label className='w-full sm:w-auto'>Edit Mode</label>
+              <Switch
+                checked={editMode}
+                onCheckedChange={(checked) => setEditMode(checked)}
+              />
             </div>
-
           </div>
-        </div> */}
-        </div>
-        <div className="grid grid-cols-6 grid-cols-1sm gap-4 justify-between w-full">
+        {/* Responsive grid for character cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-between w-full">
           {filteredCharacters.map((character: Character) => {
             // Check if the player owns the character
             const owned = player.characters.hasOwnProperty(character.unitId);
@@ -311,7 +279,7 @@ export default function Home() {
             //3. If we have not specified a filter, it should based on the owned status
             const shouldBeTransparent = (ownedFilter === 'unowned' ) || (ownedFilter !== 'unowned' && !owned);
 
-            return <Card key={character.unitId} className={"flex flex-col" + (shouldBeTransparent ? " opacity-30": "")} >
+            return <Card key={character.unitId} className={"flex flex-col min-w-0" + (shouldBeTransparent ? " opacity-30": "")} >
               <CardHeader className='text-center'>
                 <CardTitle className='text-center'><a className='flex' target="_blank" href={"https://www.prydwen.gg/etheria-restart/characters/" + character.slug}>{character.name}
                   <Image src={'./favicon-32x32.png'}
@@ -396,22 +364,95 @@ export default function Home() {
 
                   {player.characters.hasOwnProperty(character.unitId) && (
                     <div className="">
-                      <label>Skills</label>
                       {editMode ? (
-                        <div className="flex flex-row gap-2">
-                          {[1, 2, 3].map((skillNum) => (
-                            <Input
-                              key={skillNum}
-                              name={`skill${skillNum}`}
-                              type="number"
-                              placeholder={`Skill ${skillNum}`}
-                              min={0}
-                              max={5}
-                              className="w-16"
-                              value={
-                                player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
-                              }
-                              onChange={(e) => {
+
+                          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 w-full">
+                          {[1, 2, 3].map((skillNum) => {
+                            const skillValue = player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? 1;
+                            return (
+                            // <Input
+                            //   key={skillNum}
+                            //   name={`skill${skillNum}`}
+                            //   type="number"
+                            //   placeholder={`Skill ${skillNum}`}
+                            //   min={0}
+                            //   max={5}
+                            //   className="w-full sm:w-16"
+                            //   value={
+                            //     player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
+                            //   }
+                            //   onChange={(e) => {
+                            //     const value = Number(e.target.value);
+                            //     dispatch({
+                            //       type: 'player/setCharacterSkillLevel',
+                            //       payload: {
+                            //         characterId: character.unitId,
+                            //         skillIndex: skillNum - 1,
+                            //         level: value,
+                            //       },
+                            //     });
+                            //   }}
+                            // />
+                            <div key={skillNum} className="flex flex-col items-center gap-1">
+                              <label htmlFor="" className="text-xs">Skill {skillNum}</label>
+                              <div className="flex items-center border p-1.5 w-full">
+                                <button
+                                          type="button"
+                                          disabled={skillValue == 1}
+                                          onClick={() => {
+
+                                            dispatch({
+                                              type: 'player/setCharacterSkillLevel',
+                                              payload: {
+                                                characterId: character.unitId,
+                                                skillIndex: skillNum - 1,
+                                                level: skillValue - 1,
+                                              },
+                                          })
+                                        }}
+                                          aria-label="decrease"
+                                          className="group disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                          <MinusCircle className="h-4 w-4 group-hover:text-red-400" />
+                                        </button>
+                                        <div className="flex-1">
+                                          <input
+                                            name={'characterId' + character.unitId + 'skill' + skillNum}
+                                            min={1}
+                                            max={5}
+                                            step={1}
+                                            readOnly
+                                            type="number"
+                                            className="no-steps w-fit border-0 bg-transparent p-0 text-center no-steps"
+                                            value={skillValue}
+                                          />
+                                        </div>
+                                        <button
+                                          type="button"
+                                          disabled={skillValue == 5}
+                                         onClick={() => {
+                                            dispatch({
+                                              type: 'player/setCharacterSkillLevel',
+                                              payload: {
+                                                characterId: character.unitId,
+                                                skillIndex: skillNum - 1,
+                                                level: skillValue + 1,
+                                              },
+                                          })
+                                        }}
+                                          aria-label="increase"
+                                          className="group disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                          <PlusCircle className="h-4 w-4 group-hover:text-green-400" />
+                                        </button>
+                                        
+                                      </div>
+                            {/* <IncrementorInput
+                            step={1}
+                            min={1}
+                            max={5}
+                            value={player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? '1'}
+                            onChange={(e) => {
                                 const value = Number(e.target.value);
                                 dispatch({
                                   type: 'player/setCharacterSkillLevel',
@@ -422,11 +463,50 @@ export default function Home() {
                                   },
                                 });
                               }}
-                            />
-                          ))}
+                          /> */}
+                          </div>
+                          )}
+                          )}
+                          {/* <IncrementorInput
+                            step={1}
+                            min={1}
+                            max={5}
+                            value={2}
+                            onChange={(e) => console.log(e.currentTarget.value)}
+                          /> */}
                         </div>
+
+                        // <div className="flex flex-row gap-2 w-auto">
+                        //   {[1, 2, 3].map((skillNum) => (
+                        //     <Input
+                        //       key={skillNum}
+                        //       name={`skill${skillNum}`}
+                        //       type="number"
+                        //       placeholder={`Skill ${skillNum}`}
+                        //       min={0}
+                        //       max={5}
+                        //       className="w-16"
+                        //       value={
+                        //         player.characters[character.unitId]?.skillLevels[skillNum - 1] ?? '1'
+                        //       }
+                        //       onChange={(e) => {
+                        //         const value = Number(e.target.value);
+                        //         dispatch({
+                        //           type: 'player/setCharacterSkillLevel',
+                        //           payload: {
+                        //             characterId: character.unitId,
+                        //             skillIndex: skillNum - 1,
+                        //             level: value,
+                        //           },
+                        //         });
+                        //       }}
+                        //     />
+                        //   ))}
+                        // </div>
                       ) : (
+                        
                         <div className="flex flex-row gap-2">
+                          <label>Skills</label>
                           {/* The color of the span depends on the level (default, green, blue, yellow, red) */}
                           {[1, 2, 3].map((skillNum) => { 
                             
