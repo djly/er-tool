@@ -1,4 +1,17 @@
-{
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+//Data structure Version 1.0
+interface DBState {
+    version: string
+    data: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        characters: any[]; // Replace with actual character type
+    }
+}
+
+const initialState: DBState = {
+    version: "1.1",
+    data: {
         "characters": [
                 {
                     "id": "25e722cf-2fc1-5909-a229-bb447745de15",
@@ -3266,3 +3279,22 @@
                 }
                 ]
     }
+};
+
+const dbSlice = createSlice({
+    name: 'db',
+    initialState,
+    reducers: {
+        resetCharacterData(state) {
+            state.data.characters = initialState.data.characters;
+            console.log('Character data reset');
+        },
+        temp(state, action: PayloadAction<{ id: string; name: string; email: string }>) {
+            // Handle login logic here
+            
+        },
+    },
+});
+
+// export const {  } = dataSlice.actions;
+export default dbSlice.reducer;

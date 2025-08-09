@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import playerSlice from "./slices/playerSlice";
-import dataSlice from "./slices/dataSlice";
+import dbSlice from "./slices/dbSlice";
 
 import {
   FLUSH,
@@ -21,7 +21,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   player: playerSlice,
-  data: dataSlice,
+  db: dbSlice,
 })
 
 const makeConfiguredStore = () =>

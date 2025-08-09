@@ -46,6 +46,11 @@ export default function Home() {
           <p className="text-sm text-muted-foreground">Manage your account settings and preferences.</p>
           <Button onClick={() => 
             dispatch({
+              type: 'db/clearCharacterData',
+            })
+          }>Refresh Character Data</Button>
+          <Button onClick={() => 
+            dispatch({
               type: 'player/clearCharacters',
             })
           }>Clear my roster</Button>
